@@ -29,6 +29,8 @@ if (preg_match('/
 	$className = $matches['class'];
 	$description = $matches['desc'];
 
+	var_dump($description); die;
+
 	$class = new stdClass();
 	$class->name = $className;
 	$class->description = trim(preg_replace(array("/\n/", '/\s+/'), array(' ', ' '), strip_tags($description)));
