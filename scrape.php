@@ -1,6 +1,6 @@
 <?php
 
-$url = 'http://www.php.net/manual/en/class.gearmanclient.php';
+$url = 'http://www.php.net/manual/en/class.gearmanworker.php';
 echo "Downloading: $url...";
 $html = file_get_contents($url);
 echo " Done!\n";
@@ -129,7 +129,7 @@ if (preg_match('/
 						}
 						$param = new stdClass();
 						$param->name = $name;
-						$param->description = trim(preg_replace(array("/\n/", '/\s+/'), array(' ', ' '), strip_tags($description)));
+						$param->description = $desc;
 						$param->type = $type;
 						$param->default = $default;
 						$function->parameters[] = $param;
@@ -145,9 +145,9 @@ if (preg_match('/
 			$class->functions[] = $function;
 		}
 	}
-}
 
-echo "Done\n";
+	writeOut($class);
+}
 
 function writeOut(stdClass $c) {
 	$res = "<?php
@@ -175,7 +175,7 @@ class {$c->name} {
 		}
 		$res .= "\t * @return {$f->returnType} {$f->returnDescription}\n";
 		$res .= "\t */\n";
-		$res .= "\t{$f->modifier} function {$f->name} (";
+		$res .= "\t{$f->modifier} function {$f->name}(";
 		$fp = array();
 		foreach ($f->parameters as $p) {
 			$pr = $p->name;
@@ -189,7 +189,13 @@ class {$c->name} {
 
 	$res .= "}\n";
 
-	file_put_contents($c->name . '.php', $res);
+	$file = getcwd() . "/{$c->name}.php";
+	echo "Writing class to $file...";
+	if (file_put_contents($c->name . '.php', $res)) {
+		echo " Done!\n";
+	} else {
+		echo " Failed!\n";
+	}
 
 	return $res;
 }
